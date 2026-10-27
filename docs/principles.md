@@ -1,7 +1,7 @@
 # ワークフロー改善原則（技術非依存版）
 
 - 位置づけ: 改善の根拠集。規則ではない。実行時の義務は `AGENTS.md` と `docs/handoff-template.md` にだけ書く
-- 原典: このファイル。各プロジェクトは写しを持たず、ここを参照する
+- 原典: このファイル（`lbr-trio/docs/principles.md`）。写しを置くプロジェクトは、この行を残して原典を示す
 - 参照元: m5paper-dashboard の `docs/lessons-learned.md` §1〜§5、旧 `docs/improvement.md`
 - 作成: build / 2026-10-28
 - 用途: 規則を追加・削除するときの判断材料。個別の技術・ハードウェア・ビルドツールへの依存を除いた一般原則だけを収録する
