@@ -8,13 +8,12 @@
 
 - 運用ルールの原典: [AGENTS.md](AGENTS.md)
 - ハンドオフ書式: [docs/handoff-template.md](docs/handoff-template.md)
-- 改善原則（根拠集。規則ではない）: [docs/principles.md](docs/principles.md)
 - 権限設定の原典: [.opencode/opencode.json](.opencode/opencode.json)
 - 導入手順と全体像: 本 README
 - Nix 環境向けの追記: [docs/nix.md](docs/nix.md)
 
 README は案内役です。
-日々の判断は AGENTS.md、報告の書き方は handoff-template.md、根拠は principles.md、権限の実効性は opencode.json を参照してください。
+日々の判断は AGENTS.md、報告の書き方は handoff-template.md、権限の実効性は opencode.json を参照してください。
 README と原典が食い違う場合は原典を優先します。
 
 ## 1. LBR Trio の概要
@@ -102,16 +101,14 @@ cp /path/to/lbr-trio/.opencode/opencode.json .opencode/opencode.json
 
 ### ③ docs をコピーする
 
-報告書式と改善原則を同じパスにコピーします。
+報告書式を同じパスにコピーします。
 
 ```sh
 mkdir -p docs
 cp /path/to/lbr-trio/docs/handoff-template.md docs/
-cp /path/to/lbr-trio/docs/principles.md docs/
 ```
 
 `docs/handoff-template.md` はエージェントが実行時に読む書式です。必須です。
-`docs/principles.md` は規則ではなく根拠集です。写しを置かず、原典を参照する運用でも構いません。
 
 ### ④ Nix 環境では docs/nix.md を追記する
 
