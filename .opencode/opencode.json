@@ -1,0 +1,56 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agents": {
+    "build": {
+      "mode": "primary",
+      "model": "opencode-go/deepseek-v4.1-flash",
+      "color": "#22c55e"
+    },
+    "plan": {
+      "mode": "primary",
+      "model": "opencode-go/glm-5.3",
+      "color": "#3b82f6",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "edit", "resource": "~/.opencode/plan/*", "effect": "allow" },
+        { "action": "edit", "resource": "PLAN.md", "effect": "allow" },
+        { "action": "shell", "resource": "tee *", "effect": "deny" },
+        { "action": "shell", "resource": "rm *", "effect": "deny" },
+        { "action": "shell", "resource": "mv *", "effect": "deny" },
+        { "action": "shell", "resource": "git add *", "effect": "deny" },
+        { "action": "shell", "resource": "git commit *", "effect": "deny" },
+        { "action": "shell", "resource": "git push *", "effect": "deny" },
+        { "action": "shell", "resource": "git reset *", "effect": "deny" },
+        { "action": "shell", "resource": "git clean *", "effect": "deny" },
+        { "action": "shell", "resource": "git checkout *", "effect": "deny" },
+        { "action": "shell", "resource": "git restore *", "effect": "deny" },
+        { "action": "shell", "resource": "git stash *", "effect": "deny" },
+        { "action": "shell", "resource": "git merge *", "effect": "deny" },
+        { "action": "shell", "resource": "git rebase *", "effect": "deny" },
+        { "action": "shell", "resource": "herdr *", "effect": "allow" }
+      ]
+    },
+    "review": {
+      "mode": "primary",
+      "model": "opencode-go/claude-haiku-5-5",
+      "color": "#f97316",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "shell", "resource": "tee *", "effect": "deny" },
+        { "action": "shell", "resource": "rm *", "effect": "deny" },
+        { "action": "shell", "resource": "mv *", "effect": "deny" },
+        { "action": "shell", "resource": "git add *", "effect": "deny" },
+        { "action": "shell", "resource": "git commit *", "effect": "deny" },
+        { "action": "shell", "resource": "git push *", "effect": "deny" },
+        { "action": "shell", "resource": "git reset *", "effect": "deny" },
+        { "action": "shell", "resource": "git clean *", "effect": "deny" },
+        { "action": "shell", "resource": "git checkout *", "effect": "deny" },
+        { "action": "shell", "resource": "git restore *", "effect": "deny" },
+        { "action": "shell", "resource": "git stash *", "effect": "deny" },
+        { "action": "shell", "resource": "git merge *", "effect": "deny" },
+        { "action": "shell", "resource": "git rebase *", "effect": "deny" },
+        { "action": "shell", "resource": "herdr *", "effect": "allow" }
+      ]
+    }
+  }
+}
