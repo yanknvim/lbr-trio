@@ -8,12 +8,13 @@
 
 - 運用ルールの原典: [AGENTS.md](AGENTS.md)
 - ハンドオフ書式: [docs/handoff-template.md](docs/handoff-template.md)
+- 改善原則（根拠集。規則ではない）: [docs/principles.md](docs/principles.md)
 - 権限設定の原典: [.opencode/opencode.json](.opencode/opencode.json)
 - 導入手順と全体像: 本 README
 - Nix 環境向けの追記: [docs/nix.md](docs/nix.md)
 
 README は案内役です。
-日々の判断は AGENTS.md、報告の書き方は handoff-template.md、権限の実効性は opencode.json を参照してください。
+日々の判断は AGENTS.md、報告の書き方は handoff-template.md、根拠は principles.md、権限の実効性は opencode.json を参照してください。
 README と原典が食い違う場合は原典を優先します。
 
 ## 1. LBR Trio の概要
@@ -40,6 +41,7 @@ OpenCode 組み込みの `plan` エージェント（Plan モード）と ID が
 - どのロールも、相手の完了を待つターンを持ちません。
 - 下流の完了を同一ターン内で待つ必要がある場合に限り、`herdr agent get` で `working` を確認してから `herdr agent wait --until idle` で待機します。シェル側のタイムアウトは `herdr` 側より大きく設定します。
 - 報告を受け取った下流は、着手前に起点と範囲を1行の ACK で返します。ACK が届いた時点で上流は次の作業を開始できます。
+- ACK へは返信しません。応答は次の着手そのもので表します。
 - 長文の報告やレビュー結果は Markdown ファイルに出力し、そのパスを共有します。
 
 ### 報告経路
@@ -109,6 +111,7 @@ cp /path/to/lbr-trio/docs/handoff-template.md docs/
 ```
 
 `docs/handoff-template.md` はエージェントが実行時に読む書式です。必須です。
+改善原則の原典は `docs/principles.md` です。各プロジェクトは写しを置かず、原典を参照します。
 
 ### ④ Nix 環境では docs/nix.md を追記する
 
