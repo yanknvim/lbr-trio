@@ -1,4 +1,4 @@
-# PBR Trio テンプレート
+# LBR Trio テンプレート
 
 `leader` / `build` / `review` の3ロールを `herdr` で連携させる、OpenCode V2 向けのチーム開発ワークフローテンプレートです。
 アプリケーションコードは含みません。
@@ -15,9 +15,9 @@ README は案内役です。
 日々の判断は AGENTS.md、権限の実効性は opencode.json を参照してください。
 README と原典が食い違う場合は原典を優先します。
 
-## 1. PBR Trio の概要
+## 1. LBR Trio の概要
 
-PBR Trio は Plan-Build-Review の3ロールで開発を進めるワークフローです。
+LBR Trio は Leader-Build-Review の3ロールで開発を進めるワークフローです。
 各ロールは `herdr` 上の独立したペインで動作し、自分のロールを `herdr` の登録名から判断します。
 
 | ロール | 担当 | ペイン |
@@ -68,7 +68,7 @@ OpenCode 組み込みの `plan` エージェント（Plan モード）と ID が
 テンプレートの `AGENTS.md` を、新しいリポジトリのルートにコピーします。
 
 ```sh
-cp /path/to/pbr-trio/AGENTS.md ./AGENTS.md
+cp /path/to/lbr-trio/AGENTS.md ./AGENTS.md
 ```
 
 `AGENTS.md` は環境に依存しない運用ルールです。
@@ -80,7 +80,7 @@ Nix 環境で使う場合だけ、手順③で Nix セクションを追記し�
 
 ```sh
 mkdir -p .opencode
-cp /path/to/pbr-trio/.opencode/opencode.json .opencode/opencode.json
+cp /path/to/lbr-trio/.opencode/opencode.json .opencode/opencode.json
 ```
 
 `agents.<role>.model` は、利用する環境で使えるモデルに合わせて変更します。
@@ -102,7 +102,7 @@ Nix で管理された環境では、`docs/nix.md` の内容を `AGENTS.md` の�
 ```sh
 # 末尾に空行を足してから追記する
 printf '\n' >> AGENTS.md
-cat /path/to/pbr-trio/docs/nix.md >> AGENTS.md
+cat /path/to/lbr-trio/docs/nix.md >> AGENTS.md
 ```
 
 Nix を使わない環境では、この手順は不要です。
