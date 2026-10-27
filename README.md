@@ -7,12 +7,14 @@
 ## 参照構造
 
 - 運用ルールの原典: [AGENTS.md](AGENTS.md)
+- ハンドオフ書式: [docs/handoff-template.md](docs/handoff-template.md)
+- 改善原則（根拠集。規則ではない）: [docs/principles.md](docs/principles.md)
 - 権限設定の原典: [.opencode/opencode.json](.opencode/opencode.json)
 - 導入手順と全体像: 本 README
 - Nix 環境向けの追記: [docs/nix.md](docs/nix.md)
 
 README は案内役です。
-日々の判断は AGENTS.md、権限の実効性は opencode.json を参照してください。
+日々の判断は AGENTS.md、報告の書き方は handoff-template.md、根拠は principles.md、権限の実効性は opencode.json を参照してください。
 README と原典が食い違う場合は原典を優先します。
 
 ## 1. LBR Trio の概要
@@ -38,6 +40,7 @@ OpenCode 組み込みの `plan` エージェント（Plan モード）と ID が
 - 送信直後に返る `idle` は相手の着手前の状態であり、完了ではありません。
 - どのロールも、相手の完了を待つターンを持ちません。
 - 下流の完了を同一ターン内で待つ必要がある場合に限り、`herdr agent get` で `working` を確認してから `herdr agent wait --until idle` で待機します。シェル側のタイムアウトは `herdr` 側より大きく設定します。
+- 報告を受け取った下流は、着手前に起点と範囲を1行の ACK で返します。ACK が届いた時点で上流は次の作業を開始できます。
 - 長文の報告やレビュー結果は Markdown ファイルに出力し、そのパスを共有します。
 
 ### 報告経路
@@ -45,6 +48,8 @@ OpenCode 組み込みの `plan` エージェント（Plan モード）と ID が
 - `build` から `review` へ、作業内容と起点コミット（レビュー範囲）を報告します。
 - `review` から `leader` へ、最終報告を直接送ります。`build` への委託はしません。
 - `review` の指摘事項は「要修正」と「提案」に分類します。
+- 報告は [docs/handoff-template.md](docs/handoff-template.md) の6項目で行い、数値・外部仕様・実機挙動の断定には根拠タグを付けます。
+- `leader` は人間から実装指示を受けたら、自力実装を試みず、即座に `build` へ委任します。人間へは委任内容と報告経路を1行で返します。
 
 ### 権限はガードレール
 
@@ -72,7 +77,7 @@ cp /path/to/lbr-trio/AGENTS.md ./AGENTS.md
 ```
 
 `AGENTS.md` は環境に依存しない運用ルールです。
-Nix 環境で使う場合だけ、手順③で Nix セクションを追記します。
+Nix 環境で使う場合だけ、手順④で Nix セクションを追記します。
 
 ### ② opencode.json をコピーし、model を調整する
 
@@ -95,7 +100,20 @@ cp /path/to/lbr-trio/.opencode/opencode.json .opencode/opencode.json
 プロバイダーを変える場合は `provider/model` の形式で指定します。
 `agents` と `permissions` の V2 形式は維持してください。
 
-### ③ Nix 環境では docs/nix.md を追記する
+### ③ docs をコピーする
+
+報告書式と改善原則を同じパスにコピーします。
+
+```sh
+mkdir -p docs
+cp /path/to/lbr-trio/docs/handoff-template.md docs/
+cp /path/to/lbr-trio/docs/principles.md docs/
+```
+
+`docs/handoff-template.md` はエージェントが実行時に読む書式です。必須です。
+`docs/principles.md` は規則ではなく根拠集です。写しを置かず、原典を参照する運用でも構いません。
+
+### ④ Nix 環境では docs/nix.md を追記する
 
 Nix で管理された環境では、`docs/nix.md` の内容を `AGENTS.md` の末尾に追記します。
 
@@ -107,7 +125,7 @@ cat /path/to/lbr-trio/docs/nix.md >> AGENTS.md
 
 Nix を使わない環境では、この手順は不要です。
 
-### ④ herdr に3エージェントを登録する
+### ⑤ herdr に3エージェントを登録する
 
 プロジェクト名に即したチーム名（例: `my-app`）で `herdr` のワークスペースを開き、次のペイン構成にします。
 ワークスペース名は `herdr workspace create --label <チーム名>` または `herdr workspace rename <ワークスペースID> <チーム名>` で設定できます。
@@ -167,3 +185,16 @@ herdr agent prompt leader "このリポジトリの実装を始めてくださ�
 代表的な type は `feat:`、`fix:`、`docs:`、`test:`、`chore:` です。
 標準の運用では `main` ブランチへ直接コミットし、`push` は行いません。
 `build` は `review` へ報告するとき、起点コミット（レビュー範囲）を明記します。
+要件・計測・実装・文書は1コミット1役割に分けます。
+
+### ハンドオフ書式
+
+`docs/handoff-template.md` の6項目は、プロジェクトに合わせて削って構いません。
+ただし次の3点は残してください。
+
+- 起点と範囲（`起点..HEAD`）
+- 受領 ACK の1行
+- 数値・外部仕様・実機挙動への根拠タグ
+
+`leader` から人間への要約は3項目（判断材料 / 未確認 / 次の action）に固定します。
+人間が読む量を増やすと、判断に必要な情報が埋もれます。
