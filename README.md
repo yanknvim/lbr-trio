@@ -1,6 +1,6 @@
 # PBR Trio テンプレート
 
-`plan` / `build` / `review` の3ロールを `herdr` で連携させる、OpenCode V2 向けのチーム開発ワークフローテンプレートです。
+`leader` / `build` / `review` の3ロールを `herdr` で連携させる、OpenCode V2 向けのチーム開発ワークフローテンプレートです。
 アプリケーションコードは含みません。
 新しいリポジトリに、エージェントの運用ルールと権限設定を導入するための土台を配布します。
 
@@ -22,9 +22,12 @@ PBR Trio は Plan-Build-Review の3ロールで開発を進めるワークフロ
 
 | ロール | 担当 | ペイン |
 |---|---|---|
-| `plan` | 要件定義と全体統括。`build` へタスクを依頼し、`review` の最終報告を集約する。実装とレビューは行わない | 左 |
-| `build` | 実装。不明点は `plan` に確認し、完了後は起点コミットを明記して `review` へ報告する | 右上 |
-| `review` | コードレビュー。ファイルは変更せず、検証コマンドは自分で実行する。最終報告は `plan` へ直接送る | 右下 |
+| `leader` | 要件定義と全体統括。`build` へタスクを依頼し、`review` の最終報告を集約する。実装とレビューは行わない | 左 |
+| `build` | 実装。不明点は `leader` に確認し、完了後は起点コミットを明記して `review` へ報告する | 右上 |
+| `review` | コードレビュー。ファイルは変更せず、検証コマンドは自分で実行する。最終報告は `leader` へ直接送る | 右下 |
+
+`leader` は Plan 役を担いますが、ロール名に `plan` は使いません。
+OpenCode 組み込みの `plan` エージェント（Plan モード）と ID が衝突すると、毎ターン「Plan モード」の制約リマインダーが注入され、`herdr` による `build` への委任まで拒否する誤認が起きます。
 
 ### 完全非同期プロトコル
 
@@ -40,7 +43,7 @@ PBR Trio は Plan-Build-Review の3ロールで開発を進めるワークフロ
 ### 報告経路
 
 - `build` から `review` へ、作業内容と起点コミット（レビュー範囲）を報告します。
-- `review` から `plan` へ、最終報告を直接送ります。`build` への委託はしません。
+- `review` から `leader` へ、最終報告を直接送ります。`build` への委託はしません。
 - `review` の指摘事項は「要修正」と「提案」に分類します。
 
 ### 権限はガードレール
@@ -48,10 +51,11 @@ PBR Trio は Plan-Build-Review の3ロールで開発を進めるワークフロ
 `.opencode/opencode.json` の `permissions` は、ロールごとの事故を減らすためのガードレールです。
 完全な封じ込め装置ではありません。
 
-- `plan` はファイル編集を `~/.opencode/plan/*` と `PLAN.md` に限定し、シェルでは `tee` / `rm` / `mv`、書き込み系 `git`（`add` / `commit` / `push`）、破壊的な `git` 操作（`reset` / `clean` / `checkout` / `restore` / `stash` / `merge` / `rebase`）を拒否します。
+- `leader` はファイル編集を `~/.opencode/leader/*` と `PLAN.md` に限定し、シェルでは `tee` / `rm` / `mv`、書き込み系 `git`（`add` / `commit` / `push`）、破壊的な `git` 操作（`reset` / `clean` / `checkout` / `restore` / `stash` / `merge` / `rebase`）を拒否します。
 - `review` は `edit` 系ツールをすべて拒否し、`tee` / `rm` / `mv`、書き込み系 `git`、破壊的な `git` 操作の通常形式を拒否します。検証と調査のコマンドは自由に使えます。
-- `plan` と `review` の権限では、`herdr *` を最後の `allow` に置き、報告の送信が権限判定で止まらないようにします。
+- `leader` と `review` の権限では、`herdr *` を最後の `allow` に置き、報告の送信が権限判定で止まらないようにします。
 - `build` は制限なしとします。実装を止めないことを優先します。
+- 組み込みの `plan` は `disabled: true` にして、誤って Plan モードで起動しないようにします。
 
 リダイレクトや `touch` による新規作成、`sh -c` や `git -C` を前置きした迂回は、権限設定では塞ぎません。
 これらは AGENTS.md のロール規律で防ぎます。
@@ -84,7 +88,7 @@ cp /path/to/pbr-trio/.opencode/opencode.json .opencode/opencode.json
 
 | ロール | model |
 |---|---|
-| `plan` | `opencode-go/glm-5.3` |
+| `leader` | `opencode-go/glm-5.3` |
 | `build` | `opencode-go/deepseek-v4.1-flash` |
 | `review` | `opencode-go/claude-haiku-5-5` |
 
@@ -111,12 +115,12 @@ Nix を使わない環境では、この手順は不要です。
 ```text
 ┌──────────────┬──────────────┐
 │              │    build     │
-│     plan     ├──────────────┤
+│    leader    ├──────────────┤
 │              │    review    │
 └──────────────┴──────────────┘
 ```
 
-エージェント名はロール判定に使うため、`plan` / `build` / `review` から変えません。
+エージェント名はロール判定に使うため、`leader` / `build` / `review` から変えません。
 OpenCode を使う場合の起動例を示します。
 以下のコマンドは `herdr` のペイン内で実行します。
 
@@ -126,19 +130,19 @@ herdr pane split --current --direction right --cwd "$PWD" --no-focus
 herdr pane split --pane "<右上のペインID>" --direction down --cwd "$PWD" --no-focus
 
 # 実際のペインIDに置き換えて、各ペインで OpenCode を起動する
-herdr agent start plan --kind opencode --pane "<左のペインID>"
+herdr agent start leader --kind opencode --pane "<左のペインID>"
 herdr agent start build --kind opencode --pane "<右上のペインID>"
 herdr agent start review --kind opencode --pane "<右下のペインID>"
 ```
 
 すでに各ペインでエージェントを起動済みの場合は、`herdr agent rename <対象> <ロール名>` で登録名を付けます。
-OpenCode 側では、各ペインで対応するエージェント設定（`plan` / `build` / `review`）を選択してください。
+OpenCode 側では、各ペインで対応するエージェント設定（`leader` / `build` / `review`）を選択してください。
 `opencode.json` の権限は、選択中のエージェント設定にだけ適用されます。
 登録後は `herdr agent list` で3つの名前と状態を確認できます。
-最初の指示は `plan` に送ります。
+最初の指示は `leader` に送ります。
 
 ```sh
-herdr agent prompt plan "このリポジトリの実装を始めてください。"
+herdr agent prompt leader "このリポジトリの実装を始めてください。"
 ```
 
 ## 3. カスタマイズポイント
@@ -153,7 +157,7 @@ herdr agent prompt plan "このリポジトリの実装を始めてください�
 ### 権限
 
 `permissions` は、ロールの事故を減らすための最小限の拒否リストとして保守します。
-新しいツールや危険なコマンドを追加するときは、`plan` と `review` の `deny` を検討します。
+新しいツールや危険なコマンドを追加するときは、`leader` と `review` の `deny` を検討します。
 `herdr *` の `allow` は末尾に残してください。
 権限設定は封じ込め装置ではないため、ロール規律を緩める場合は AGENTS.md の該当節も合わせて見直します。
 

@@ -6,13 +6,13 @@
       "model": "opencode-go/deepseek-v4.1-flash",
       "color": "#22c55e"
     },
-    "plan": {
+    "leader": {
       "mode": "primary",
       "model": "opencode-go/glm-5.3",
       "color": "#3b82f6",
       "permissions": [
         { "action": "edit", "resource": "*", "effect": "deny" },
-        { "action": "edit", "resource": "~/.opencode/plan/*", "effect": "allow" },
+        { "action": "edit", "resource": "~/.opencode/leader/*", "effect": "allow" },
         { "action": "edit", "resource": "PLAN.md", "effect": "allow" },
         { "action": "shell", "resource": "tee *", "effect": "deny" },
         { "action": "shell", "resource": "rm *", "effect": "deny" },
@@ -30,6 +30,7 @@
         { "action": "shell", "resource": "herdr *", "effect": "allow" }
       ]
     },
+    "plan": { "disabled": true },
     "review": {
       "mode": "primary",
       "model": "opencode-go/claude-haiku-5-5",
