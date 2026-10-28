@@ -7,13 +7,12 @@
 ## 参照構造
 
 - 運用ルールと報告書式の原典: [AGENTS.md](AGENTS.md)
-- 改善原則（根拠集。規則ではない）: [docs/principles.md](docs/principles.md)
 - 権限設定の原典: [.opencode/opencode.json](.opencode/opencode.json)
 - 導入手順と全体像: 本 README
 - Nix 環境向けの追記: [docs/nix.md](docs/nix.md)
 
 README は案内役です。
-日々の判断と報告の書き方は AGENTS.md、根拠は principles.md、権限の実効性は opencode.json を参照してください。
+日々の判断と報告の書き方は AGENTS.md、権限の実効性は opencode.json を参照してください。
 README と原典が食い違う場合は原典を優先します。
 
 ## 1. LBR Trio の概要
@@ -98,10 +97,9 @@ cp /path/to/lbr-trio/.opencode/opencode.json .opencode/opencode.json
 プロバイダーを変える場合は `provider/model` の形式で指定します。
 `agents` と `permissions` の V2 形式は維持してください。
 
-### ③ 改善原則を参照する
+### ③ docs のコピーは不要
 
-報告書式は `AGENTS.md` に統合済みのため、コピーする docs はありません。
-改善原則の原典は `docs/principles.md` です。各プロジェクトは写しを置かず、原典を参照します。
+報告書式は `AGENTS.md` に統合済みです。コピーが必要な docs はありません。
 
 ### ④ Nix 環境では docs/nix.md を追記する
 
