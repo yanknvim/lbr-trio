@@ -6,15 +6,14 @@
 
 ## 参照構造
 
-- 運用ルールの原典: [AGENTS.md](AGENTS.md)
-- ハンドオフ書式: [docs/handoff-template.md](docs/handoff-template.md)
+- 運用ルールと報告書式の原典: [AGENTS.md](AGENTS.md)
 - 改善原則（根拠集。規則ではない）: [docs/principles.md](docs/principles.md)
 - 権限設定の原典: [.opencode/opencode.json](.opencode/opencode.json)
 - 導入手順と全体像: 本 README
 - Nix 環境向けの追記: [docs/nix.md](docs/nix.md)
 
 README は案内役です。
-日々の判断は AGENTS.md、報告の書き方は handoff-template.md、根拠は principles.md、権限の実効性は opencode.json を参照してください。
+日々の判断と報告の書き方は AGENTS.md、根拠は principles.md、権限の実効性は opencode.json を参照してください。
 README と原典が食い違う場合は原典を優先します。
 
 ## 1. LBR Trio の概要
@@ -38,18 +37,16 @@ OpenCode 組み込みの `plan` エージェント（Plan モード）と ID が
 - `herdr agent prompt <ロール> "<メッセージ>"` を `--wait` なしで実行し、送信後は自分のターンを終了します。
 - 返答や完了通知は、自分のペインに届くメッセージとして受け取ります。
 - 送信直後に返る `idle` は相手の着手前の状態であり、完了ではありません。
-- どのロールも、相手の完了を待つターンを持ちません。
-- 下流の完了を同一ターン内で待つ必要がある場合に限り、`herdr agent get` で `working` を確認してから `herdr agent wait --until idle` で待機します。シェル側のタイムアウトは `herdr` 側より大きく設定します。
-- 報告を受け取った下流は、着手前に起点と範囲を1行の ACK で返します。ACK が届いた時点で上流は次の作業を開始できます。
-- ACK へは返信しません。応答は次の着手そのもので表します。
+- どのロールも、相手の完了を待つターンを持ちません。待つ必要がある場面は人間に回します。
+- 受領の返信（ACK）は送りません。沈黙＝受領とみなし、連絡するのは異常時（起点が存在しない、範囲が読めない等）だけにします。
 - 長文の報告やレビュー結果は Markdown ファイルに出力し、そのパスを共有します。
 
 ### 報告経路
 
-- `build` から `review` へ、作業内容と起点コミット（レビュー範囲）を報告します。
+- `build` から `review` へ、作業内容と範囲（`起点..終点SHA`）を報告します。
 - `review` から `leader` へ、最終報告を直接送ります。`build` への委託はしません。
 - `review` の指摘事項は「要修正」と「提案」に分類します。
-- 報告は [docs/handoff-template.md](docs/handoff-template.md) の6項目で行い、数値・外部仕様・実機挙動の断定には根拠タグを付けます。
+- 報告は AGENTS.md の「報告ヘッダ」3項目（範囲 / 検証 / 未確認事項）で行い、数値・外部仕様・実機挙動の断定には根拠タグを付けます。
 - `leader` は人間から実装指示を受けたら、自力実装を試みず、即座に `build` へ委任します。人間へは委任内容と報告経路を1行で返します。
 
 ### 権限はガードレール
@@ -101,16 +98,9 @@ cp /path/to/lbr-trio/.opencode/opencode.json .opencode/opencode.json
 プロバイダーを変える場合は `provider/model` の形式で指定します。
 `agents` と `permissions` の V2 形式は維持してください。
 
-### ③ docs をコピーする
+### ③ 改善原則を参照する
 
-報告書式を同じパスにコピーします。
-
-```sh
-mkdir -p docs
-cp /path/to/lbr-trio/docs/handoff-template.md docs/
-```
-
-`docs/handoff-template.md` はエージェントが実行時に読む書式です。必須です。
+報告書式は `AGENTS.md` に統合済みのため、コピーする docs はありません。
 改善原則の原典は `docs/principles.md` です。各プロジェクトは写しを置かず、原典を参照します。
 
 ### ④ Nix 環境では docs/nix.md を追記する
@@ -184,17 +174,14 @@ herdr agent prompt leader "このリポジトリの実装を始めてくださ�
 コミットは Conventional Commits に従います。
 代表的な type は `feat:`、`fix:`、`docs:`、`test:`、`chore:` です。
 標準の運用では `main` ブランチへ直接コミットし、`push` は行いません。
-`build` は `review` へ報告するとき、起点コミット（レビュー範囲）を明記します。
-要件・計測・実装・文書は1コミット1役割に分けます。
+`build` は `review` へ報告するとき、範囲を `起点..終点SHA` で明記します。
+要件・計測・実装・文書は1コミット1役割に分け、コミットメッセージの prefix（`要件:` `計測:` `実装:` `文書:`）で役割を表します。
 
-### ハンドオフ書式
+### 報告書式
 
-`docs/handoff-template.md` の6項目は、プロジェクトに合わせて削って構いません。
-ただし次の3点は残してください。
-
-- 起点と範囲（`起点..HEAD`）
-- 受領 ACK の1行
-- 数値・外部仕様・実機挙動への根拠タグ
+報告書式は [AGENTS.md](AGENTS.md) の「報告の書式」に集約しています。
+`build` → `review` と `review` → `leader` は共通の3項目ヘッダ（範囲 / 検証 / 未確認事項）を使い、`review` → `leader` は判定（合格 / 要修正残）を添えます。
+数値・外部仕様・実機挙動の断定には根拠タグ（`[source: path:line]` / `[test: コマンド]` / `[unverified]`）を付けます。
 
 `leader` から人間への要約は3項目（判断材料 / 未確認 / 次の action）に固定します。
 人間が読む量を増やすと、判断に必要な情報が埋もれます。
